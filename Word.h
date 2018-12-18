@@ -13,7 +13,7 @@ class Word // Word = State that your in
 
 	//Next States index
 
-	std::deque<std::pair<Word*, int>> m_next_states_index; //Index for all possible next_states and amount of times they appear
+	std::vector<std::pair<Word*, int>> m_next_states_index; //Index for all possible next_states and amount of times they appear
 	int m_total; //total words linked to this word (used to calculate probability
 
 public:
