@@ -3,7 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <deque>
 #include <utility>
+#include <iostream>
 
 class Word // Word = State that your in
 {
@@ -11,17 +13,19 @@ class Word // Word = State that your in
 
 	//Next States index
 
-	std::vector<std::pair<Word*, int>> m_next_states_index; //Index for all possible next_states and amount of times they appear
-	size_t m_total;
+	std::deque<std::pair<Word*, int>> m_next_states_index; //Index for all possible next_states and amount of times they appear
+	int m_total; //total words linked to this word (used to calculate probability
 
 public:
 
 	int Check_word_index(std::string& str) ;
+
 	Word& operator+=( Word& new_word);
 
-	std::string getNextWord() const;
+	Word& getNextWord() const;
 	std::string getName() const;
 
+	std::ostream& printProbabilites(std::ostream& os) const;
 	
 
 	Word();

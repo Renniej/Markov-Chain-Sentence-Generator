@@ -1,5 +1,7 @@
 #include <random>
 #include <algorithm>
+#include <cstdlib>
+
 #include "Word.h"
 
 
@@ -26,7 +28,7 @@ Word& Word::operator+=( Word& new_word)
 	if ( found == -1) { //If the word does not exist in the 
 
 		m_next_states_index.push_back(std::make_pair(&new_word, 1));
-
+		
 	}
 	else { //if it does then add 1 to it's counter
 	
@@ -34,41 +36,66 @@ Word& Word::operator+=( Word& new_word)
 
 	}
 	
+	++m_total;
 
 	return *this;
 }
 
-std::string Word::getNextWord() const
+
+
+Word& Word::getNextWord() const
 {
-	
-	//Grabbed from stackoverflow
-	std::random_device rd; // obtain a random number from hardware
-	std::mt19937 eng(rd()); // seed the generator
-	std::uniform_int_distribution<> range(0, m_total); // define the range
-
-	double rand = range(rd);
-
-
-	for (auto i : m_next_states_index) {
-
-		if (rand < i.second) {
-
-			return i.first->getName();
-
-		}
-
-
-	}
+	Word* found = nullptr;
+	int chance;
+	int selected_word;
 	
 
+	do {
 
+		 chance = rand() %  m_total + 1;
+		 selected_word = rand() % m_next_states_index.size();
+
+		
+
+		 if (m_next_states_index[selected_word].second <= chance) {
+			 found = m_next_states_index[selected_word].first;
+		 }
+		
+
+
+
+	} while(found == nullptr);
+
+	return *found;
 
 
 }
 
+
+
+
+
+
 std::string Word::getName() const
 {
 	return m_name;
+}
+
+std::ostream & Word::printProbabilites(std::ostream& os) const
+{
+	
+
+	for (const auto& i : m_next_states_index) {
+
+		os << i.first->getName() << " Chances: " << i.second << "/" << m_total << std::endl;
+		
+
+	}
+
+	return os;
+
+
+
 }
 
 
@@ -85,7 +112,7 @@ Word::Word(const char * word)
 {
 
 	m_name = word;
-
+	m_total = 0;
 }
 
 
