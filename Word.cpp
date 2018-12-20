@@ -9,6 +9,14 @@
 
 
 
+void Word::setToEmptyState()
+{
+
+	m_name = "Empty_State";
+	m_total = -1;
+
+}
+
 int Word::Check_word_index(std::string & str)   //Check if str is an word that already exist in this object's index.
 {
 	
@@ -43,7 +51,7 @@ Word& Word::operator+=( Word& new_word)
 
 
 
-Word& Word::getNextWord() const
+Word* Word::getNextWord() const
 {
 
 
@@ -67,7 +75,7 @@ Word& Word::getNextWord() const
 		} while (found == nullptr);
 
 	}
-	return *found;
+	return found;
 
 
 }
@@ -76,6 +84,48 @@ Word& Word::getNextWord() const
 
 
 
+
+std::string Word::make_sentence(size_t length) //should move this to text_generator
+{
+	
+	std::string sentence;
+	
+	if (length > 0) {
+
+		sentence = m_name;
+
+		Word* next_word = getNextWord();
+
+		
+
+
+
+			for (int i = 0; i < length; ++i) {
+
+				if (next_word != nullptr) {
+
+					sentence += " " + next_word->getName();
+					next_word = next_word->getNextWord();
+
+
+				}
+				else {
+					break;
+				}
+
+		
+			}
+
+		
+	}
+	else {
+
+		sentence = "Invalid Length. No sentence was generated";
+	}
+
+	return sentence;
+
+}
 
 std::string Word::getName() const
 {
@@ -103,7 +153,7 @@ std::ostream & Word::printProbabilites(std::ostream& os) const
 
 Word::Word()
 {
-
+	setToEmptyState();
 
 	throw std::string("initate default constructor not allowed!");
 
@@ -111,6 +161,7 @@ Word::Word()
 
 Word::Word(const char * word)
 {
+	setToEmptyState();
 
 	m_name = word;
 	m_total = 0;

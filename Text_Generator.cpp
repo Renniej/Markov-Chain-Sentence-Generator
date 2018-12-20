@@ -5,24 +5,59 @@
 
 Text_Generator::Text_Generator()
 {
-
+	m_list_size = 0;
 	throw std::string("Empty State for generator not allowed");
 }
 
 Text_Generator::Text_Generator(const char* str) //Recieves sentence
 {
-
+	m_list_size = 0;
 	Add_Source(str);
 
 
 }
 
-void Text_Generator::Add_Source(const char * str)
+Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can increase my knowledge <3
+{
+
+
+	if (ifs.good()) {
+
+		std::string line;
+
+		while (ifs.good()) {
+
+			std::getline(ifs, line);
+
+			std::cout << "Eating Line: " << line << std::endl;
+
+			Add_Source(line.c_str());
+
+			std::cout << "YUM, that line was delicious :)" << std::endl << std::endl;
+
+		}
+
+
+
+
+	}
+	else {
+
+		throw std::string("BAD FILE!");
+	}
+
+
+
+
+
+}
+
+void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can increase my knowledge <3
 {
 
 	std::string text = str;
 	std::string tmp_word;
-	int i = 0;
+
 
 	std::vector<Word>::iterator it;  //research iterators more
 
@@ -38,10 +73,10 @@ void Text_Generator::Add_Source(const char * str)
 
 
 
-		m_words.push_back(Word(text.substr(0, next_pos).c_str()));
-
-		it = m_words.begin();//research iterators more
-		prev_word = &m_words[i++];//research iterators more
+		m_words.push_front(Word(text.substr(0, next_pos).c_str()));
+		++m_list_size;
+		
+		prev_word = &m_words.front();
 
 	}
 
@@ -61,19 +96,21 @@ void Text_Generator::Add_Source(const char * str)
 
 
 		//Look for a word object that matches tmp_word
-		auto& found_word = std::find_if(m_words.begin(), m_words.end(), [&](Word elem) {return elem.getName().compare(tmp_word) == 0; });
+		
+		auto& found_word = std::find_if(m_words.begin(), m_words.end(), [&](Word elem) {return strcmpi(elem.getName().c_str(), tmp_word.c_str()) == 0; });
 
 
 		if (found_word != std::end(m_words)) { //If matching word object is found then add it to previous word for future probability calculations
 
-			m_words[i - 1] += *found_word; //Don't really get why I have to do it this way.... more research.
+			*prev_word += *found_word; //Don't really get why I have to do it this way.... more research.
+			prev_word = &(*found_word);
 		}
 		else { //else create a new word object and add it to previous word for future probability calculations
 			
 			
-			m_words.push_back(Word(tmp_word.c_str()));
-			m_words[i-1] += m_words.back();
-			++i;
+			m_words.push_front(Word(tmp_word.c_str()));
+			++m_list_size;
+			prev_word = &m_words.front();
 
 		}
 
@@ -81,33 +118,12 @@ void Text_Generator::Add_Source(const char * str)
 	}
 }
 
-std::string & Text_Generator::make_sentence()
+std::string Text_Generator::make_sentence()
 {
 	
-	int length = rand() % 30 + 1; //Number of words in sentence (0-30)
-	Word* word = &m_words[rand() % m_words.size()];
+	int length = rand() % 30 + 1; //Number of words in sentence (1-30)
 
-
-
-	std::string sentence(word->getName());
-	word = &word->getNextWord();
-	
-
-
-
-	for (int i = 0; i < length; ++i) {
-
-
-		sentence += word->getName();
-		word = &word->getNextWord();
-
-		if (word == nullptr) {
-			break;
-		}
-
-	}
-
-	return sentence;
+	return m_words.front().make_sentence(length);
 
 }
 	

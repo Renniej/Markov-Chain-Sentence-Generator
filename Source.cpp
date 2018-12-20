@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Text_Generator.h"
 #include <ctime>
-
+#include <fstream>
 
 int main(void) {
 	srand(time(NULL));
@@ -25,12 +25,18 @@ int main(void) {
 	word1.printProbabilites(std::cout);
 	*/
 
+	std::ifstream file("Example_Text");
 	std::string text("The brown lazy fox jumps over the fence");
 
-	std::cout << text[34];
+	
 
-	Text_Generator test(text.c_str());
+	Text_Generator test1(text.c_str());
+	Text_Generator test2(file);
 
-	std::cout << test.make_sentence();
+
+	std::cout << "Test 1: " << test1.make_sentence();
+	std::cout << "Test 2: " << test2.make_sentence();
+
+
 
 }
