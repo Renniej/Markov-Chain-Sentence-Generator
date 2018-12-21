@@ -4,6 +4,8 @@
 #include <fstream>
 
 int main(void) {
+	
+	
 	srand(time(NULL));
 
 
@@ -31,11 +33,11 @@ int main(void) {
 	
 
 	Text_Generator test1(text.c_str());
-	Text_Generator test2(file);
+	//Text_Generator test2(file);
 
 
-	std::cout << "Test 1: " << test1.make_sentence();
-	std::cout << "Test 2: " << test2.make_sentence();
+	std::cout << "Test 1: " << test1.make_sentence() << std::endl;
+	//std::cout << "Test 2: " << test2.make_sentence() << std::endl;
 
 
 

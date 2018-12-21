@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <algorithm>
+#include <cctype>
 
 Text_Generator::Text_Generator()
 {
@@ -55,68 +56,134 @@ Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can incr
 void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can increase my knowledge <3
 {
 
-	std::string text = str;
-	std::string tmp_word;
+	
+	std::string line = str; //Single line of words copied from a source
+	std::string grabbed_word; //Single word grabbed from line
 
+	Word * prev_word = nullptr; //Word object representing previous word grabbed 
+	Word * found_word = nullptr; //Used to check if a word object exist in m_words
+	Word * Spec_Char = nullptr; //Special characters get their own word object. 
 
-	std::vector<Word>::iterator it;  //research iterators more
+	int next_pos = line.find(" "); //next position in line to scan (Delimiter is a space)
+	int prev_pos = 0;
 
-	Word * prev_word = nullptr;
-
-	int next_pos = text.find(" ");
-
-
-
-	//read one word of the string at a time till you reach end of string
-
-	if (text.find(" ", next_pos + 1) != std::string::npos) {
-
-
-
-		m_words.push_front(Word(text.substr(0, next_pos).c_str()));
-		++m_list_size;
+	if (!line.empty()) {  //If string is not empty
 		
-		prev_word = &m_words.front();
+		//Before starting a loop we grab the first word in the line, check if it already exist in m_words list and then set that object to prev_word for upcoming loop 
+
+
+		grabbed_word = CheckForSpecialChar(line.substr(0, next_pos)); //Grab first word from line
+		
+		found_word = Find_Word(grabbed_word); //Check if first word exist in m_words list
+
+		if (found_word != nullptr) { //If Word object that matches first str_word exist then
+
+
+			prev_word = found_word;  //set previous word object pointer to found_word object for upcoming loop
+
+		}
+		else { //if Word object doesn't exist that matches first str_word then 
+
+			m_words.push_front(Word(grabbed_word.c_str())); //Create word object for str_word and push it to m_words list
+			prev_word = &m_words.front(); //Set newly created word objec to prev_word for upcoming loop
+
+		}
+
+
+
+		//Now that we have data necessarily for looping (prev_word & next_pos)
+		prev_pos = next_pos; //Set previous position to where last space was
+		next_pos = line.find(" ", next_pos + 1); //Grab next space.
+
+		
+		while (next_pos != std::string::npos) {
+
+			grabbed_word = CheckForSpecialChar(line.substr(prev_pos + 1, next_pos - 1)); //Grab word from line
+			found_word = Find_Word(grabbed_word); //Check if first word exist in m_words list
+
+
+			if (found_word != nullptr) { //If Word object that matches first str_word exist then
+
+				*prev_word += *found_word; //Add found word object to prev_word's list of next_words.
+				prev_word = found_word;  //set previous word object pointer to found_word object for upcoming loop
+
+			}
+			else { //if Word object doesn't exist that matches first str_word then 
+
+				m_words.push_front(Word(grabbed_word.c_str())); //Create word object for str_word and push it to m_words list
+
+				*prev_word += m_words.front(); //Add new word object to prev_word's list of next_words.
+
+				prev_word = &m_words.front(); //Set newly created word objec to prev_word for upcoming loop
+
+			}
+
+			prev_pos = next_pos; //Set previous position to where last space was
+			next_pos = line.find(" ", next_pos + 1); //Grab next space.
+
+		}
+
+		
+
+
+
+
 
 	}
 
 
-	while (text.find(" ", next_pos + 1) != std::string::npos) {
 
 
-		if (text.find(' ', next_pos + 1) != std::string::npos) { //If another space exist after this space then grab the text between those spaces
-
-			tmp_word = text.substr(next_pos + 1, text.find(" ", next_pos+1) - next_pos-1);
-			next_pos = text.find(" ", next_pos + 1);
-
-		}
-		else { //else assume you are at the end of the line and grab word between current space and end of text 
-			tmp_word = text.substr(next_pos);
-		}
 
 
-		//Look for a word object that matches tmp_word
-		
-		auto& found_word = std::find_if(m_words.begin(), m_words.end(), [&](Word elem) {return strcmpi(elem.getName().c_str(), tmp_word.c_str()) == 0; });
 
 
-		if (found_word != std::end(m_words)) { //If matching word object is found then add it to previous word for future probability calculations
-
-			*prev_word += *found_word; //Don't really get why I have to do it this way.... more research.
-			prev_word = &(*found_word);
-		}
-		else { //else create a new word object and add it to previous word for future probability calculations
-			
-			
-			m_words.push_front(Word(tmp_word.c_str()));
-			++m_list_size;
-			prev_word = &m_words.front();
-
-		}
 
 
-	}
 }
+
+Word * Text_Generator::Find_Word(std::string word) 
+{
+	
+
+	Word * tmp = nullptr;
+	auto& found_word = std::find_if(m_words.begin(), m_words.end(), [&](Word elem) {return strcmpi(elem.getName().c_str(), word.c_str()) == 0; });
+
+
+	if (found_word != std::end(m_words)) { //If matching word object is found then add it to previous word for future probability calculations
+
+		tmp = &(*found_word);
+
+	}
+
+
+	return tmp;
+
+
+
+}
+
+std::string & Text_Generator::CheckForSpecialChar(std::string& str_word)
+{
+
+	for (int i = 0; i < str_word.length(); ++i) {
+
+		if (!isalpha(str_word[i])) { //If a non-alphabetic letter is found then assume it is a special character then...
+
+			str_word.erase(i); //Remove special character
+
+
+		}
+
+
+	}
+
+	return str_word;
+}
+
+
+
+
 
 std::string Text_Generator::make_sentence()
 {

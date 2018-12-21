@@ -13,11 +13,23 @@ class Text_Generator
 	std::list<Word> m_words;
 	size_t m_list_size;
 
-public:
+
 	void Add_Source(const char* str);
 
-	std::string make_sentence();
 
+	Word *  Find_Word(std::string word);
+
+	std::string& CheckForSpecialChar(std::string& str_word);
+
+
+
+	
+
+public:
+	
+
+	std::string make_sentence();
+	
 
 	Text_Generator();
 	Text_Generator(const char* str);
