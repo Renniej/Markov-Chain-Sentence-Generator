@@ -28,16 +28,13 @@ int main(void) {
 	*/
 
 	std::ifstream file("Example_Text");
-	std::string text("The brown lazy fox jumps over the fence");
-
+	
 	
 
-	Text_Generator test1(text.c_str());
-	//Text_Generator test2(file);
 
+	Text_Generator test(file);
 
-	std::cout << "Test 1: " << test1.make_sentence() << std::endl;
-	//std::cout << "Test 2: " << test2.make_sentence() << std::endl;
+	std::cout << "Test: " << test.make_sentence() << std::endl;
 
 
 

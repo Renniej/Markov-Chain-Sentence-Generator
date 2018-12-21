@@ -123,6 +123,9 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 		sentence = "Invalid Length. No sentence was generated";
 	}
 
+
+	sentence[0] = toupper(sentence[0]);
+	sentence += ".";
 	return sentence;
 
 }

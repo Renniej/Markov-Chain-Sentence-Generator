@@ -24,22 +24,31 @@ Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can incr
 
 	if (ifs.good()) {
 
+
+		
+
 		std::string line;
+		int i = 0;
+
+		std::cout << "OOOHHHH DINNER! :)" << std::endl;
+		
 
 		while (ifs.good()) {
 
+			std::cout << "Eating Line: " << ++i;
+			
+
 			std::getline(ifs, line);
 
-			std::cout << "Eating Line: " << line << std::endl;
-
 			Add_Source(line.c_str());
-
-			std::cout << "YUM, that line was delicious :)" << std::endl << std::endl;
+	
+			
+			std::cout << '\r';
 
 		}
 
-
-
+		
+		std::cout << std::endl << "I finished eating " << i << " lines! THANK YOU" << std::endl << std::endl;
 
 	}
 	else {
@@ -188,7 +197,7 @@ std::string & Text_Generator::CheckForSpecialChar(std::string& str_word)
 std::string Text_Generator::make_sentence()
 {
 	
-	int length = rand() % 30 + 1; //Number of words in sentence (1-30)
+	int length = rand() % 15 + 1; //Number of words in sentence (1-30)
 
 	return m_words.front().make_sentence(length);
 
