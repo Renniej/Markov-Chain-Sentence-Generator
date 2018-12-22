@@ -27,7 +27,7 @@ public:
 	Word* getNextWord() const;
 
 	std::string make_sentence(size_t size);
-	std::string getName() const;
+	const std::string& getName() const;
 
 	std::ostream& printProbabilites(std::ostream& os) const;
 	
@@ -35,6 +35,14 @@ public:
 
 	Word();
 	Word(const char *); //possible move???
+	Word(std::string&& str); //for optimization purposes
+	Word(const std::string& str);
+
+	Word(const Word& src);
+	Word(Word&& src);
+
+
+
 	~Word();
 };
 

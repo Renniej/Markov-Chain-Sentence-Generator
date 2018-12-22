@@ -27,14 +27,28 @@ int main(void) {
 	word1.printProbabilites(std::cout);
 	*/
 
-	std::ifstream file("Example_Text");
+	std::ifstream file("Example_Text.txt");
 	
 	
 
 
-	Text_Generator test(file);
+	Text_Generator test(file, " ");
 
-	std::cout << "Test: " << test.make_sentence() << std::endl;
+	for (int i = 0; i<5; ++i)
+	std::cout << test.make_sentence() << std::endl;
+
+
+	for (int i = 0; i < 5; ++i)
+		std::cout << test.make_sentence() << std::endl;
+
+
+
+	for (int i = 0; i < 5; ++i)
+		std::cout << test.make_sentence() << std::endl;
+
+
+	for (int i = 0; i < 5; ++i)
+		std::cout << test.make_sentence() << std::endl;
 
 
 

@@ -18,19 +18,22 @@ Text_Generator::Text_Generator(const char* str) //Recieves sentence
 
 }
 
-Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can increase my knowledge <3
+Text_Generator::Text_Generator(std::ifstream& ifs, const char * delimter) : delim(delimter) //Feed me WORDS so i can increase my knowledge <3
 {
 
+	std::string line;
+	int i = 0;
+	m_list_size = 0;
+	
 
 	if (ifs.good()) {
 
 
 		
 
-		std::string line;
-		int i = 0;
+		
 
-		std::cout << "OOOHHHH DINNER! :)" << std::endl;
+		std::cout << "Reading File! :)" << '\n';
 		
 
 		while (ifs.good()) {
@@ -40,7 +43,7 @@ Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can incr
 
 			std::getline(ifs, line);
 
-			Add_Source(line.c_str());
+			Add_Source(line);
 	
 			
 			std::cout << '\r';
@@ -48,7 +51,7 @@ Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can incr
 		}
 
 		
-		std::cout << std::endl << "I finished eating " << i << " lines! THANK YOU" << std::endl << std::endl;
+		std::cout << '\n' << "I finished eating " << i << " lines! THANK YOU" << '\n' << '\n';
 
 	}
 	else {
@@ -62,18 +65,20 @@ Text_Generator::Text_Generator(std::ifstream& ifs) //Feed me WORDS so i can incr
 
 }
 
-void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can increase my knowledge <3
+void Text_Generator::Add_Source(const std::string& line ) //Feed me WORDS so i can increase my knowledge <3
 {
 
 	
-	std::string line = str; //Single line of words copied from a source
+	 //Single line of words copied from a source
 	std::string grabbed_word; //Single word grabbed from line
 
 	Word * prev_word = nullptr; //Word object representing previous word grabbed 
 	Word * found_word = nullptr; //Used to check if a word object exist in m_words
-	Word * Spec_Char = nullptr; //Special characters get their own word object. 
 
-	int next_pos = line.find(" "); //next position in line to scan (Delimiter is a space)
+	
+
+
+	int next_pos = line.find(delim); //next position in line to scan (Delimiter is a space)
 	int prev_pos = 0;
 
 	if (!line.empty()) {  //If string is not empty
@@ -93,7 +98,9 @@ void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can incre
 		}
 		else { //if Word object doesn't exist that matches first str_word then 
 
-			m_words.push_front(Word(grabbed_word.c_str())); //Create word object for str_word and push it to m_words list
+			m_words.emplace_front(std::move(Word(std::move(grabbed_word)))); //Create word object for str_word and push it to m_words list
+			++m_list_size;
+
 			prev_word = &m_words.front(); //Set newly created word objec to prev_word for upcoming loop
 
 		}
@@ -102,7 +109,7 @@ void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can incre
 
 		//Now that we have data necessarily for looping (prev_word & next_pos)
 		prev_pos = next_pos; //Set previous position to where last space was
-		next_pos = line.find(" ", next_pos + 1); //Grab next space.
+		next_pos = line.find(delim, next_pos + 1); //Grab next space.
 
 		
 		while (next_pos != std::string::npos) {
@@ -119,7 +126,9 @@ void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can incre
 			}
 			else { //if Word object doesn't exist that matches first str_word then 
 
-				m_words.push_front(Word(grabbed_word.c_str())); //Create word object for str_word and push it to m_words list
+
+				m_words.emplace_front(std::move(Word(std::move(grabbed_word)))); //Create word object for str_word and push it to m_words list
+				++m_list_size;
 
 				*prev_word += m_words.front(); //Add new word object to prev_word's list of next_words.
 
@@ -128,7 +137,7 @@ void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can incre
 			}
 
 			prev_pos = next_pos; //Set previous position to where last space was
-			next_pos = line.find(" ", next_pos + 1); //Grab next space.
+			next_pos = line.find(delim, next_pos + 1); //Grab next space.
 
 		}
 
@@ -151,12 +160,12 @@ void Text_Generator::Add_Source(const char * str) //Feed me WORDS so i can incre
 
 }
 
-Word * Text_Generator::Find_Word(std::string word) 
+Word * Text_Generator::Find_Word(const std::string word)
 {
 	
 
 	Word * tmp = nullptr;
-	auto& found_word = std::find_if(m_words.begin(), m_words.end(), [&](Word elem) {return strcmpi(elem.getName().c_str(), word.c_str()) == 0; });
+	auto& found_word = std::find_if(m_words.begin(), m_words.end(), [&](Word elem) {return elem.getName().compare(word) == 0; }); //Check if word exist in found word
 
 
 	if (found_word != std::end(m_words)) { //If matching word object is found then add it to previous word for future probability calculations
@@ -177,7 +186,7 @@ std::string & Text_Generator::CheckForSpecialChar(std::string& str_word)
 
 	for (int i = 0; i < str_word.length(); ++i) {
 
-		if (!isalpha(str_word[i])) { //If a non-alphabetic letter is found then assume it is a special character then...
+		if (!isalpha(str_word[i])  || strcmp(&str_word[i], " ")  == 0) { //If a non-alphabetic letter is found then assume it is a special character then...
 
 			str_word.erase(i); //Remove special character
 
@@ -197,9 +206,13 @@ std::string & Text_Generator::CheckForSpecialChar(std::string& str_word)
 std::string Text_Generator::make_sentence()
 {
 	
-	int length = rand() % 15 + 1; //Number of words in sentence (1-30)
+	int length = rand() % 15 + 10; //Number of words in sentence (1-30)
+	int word_index = rand() % (m_list_size - 1);
+	std::forward_list<Word>::iterator itr = m_words.begin();
 
-	return m_words.front().make_sentence(length);
+	std::advance(itr, rand() % m_list_size);
+
+	return (*itr).make_sentence(length);
 
 }
 	

@@ -93,12 +93,16 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 	if (length > 0) {
 
 		sentence = m_name;
+		bool complete; //Represents a complete sentence
 
 		Word* next_word = getNextWord();
 
 		
 
 
+		do {
+
+			complete = true; //Assume the sentence made will be approiate length
 
 			for (int i = 0; i < length; ++i) {
 
@@ -110,12 +114,14 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 
 				}
 				else {
+					complete = false; //Nullptr found early, break loop and try again.
 					break;
 				}
 
-		
+
 			}
 
+		} while (!complete);
 		
 	}
 	else {
@@ -123,6 +129,7 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 		sentence = "Invalid Length. No sentence was generated";
 	}
 
+	std::transform(sentence.begin(), sentence.end(), sentence.begin(), ::tolower);
 
 	sentence[0] = toupper(sentence[0]);
 	sentence += ".";
@@ -130,7 +137,7 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 
 }
 
-std::string Word::getName() const
+const std::string& Word::getName() const
 {
 	return m_name;
 }
@@ -164,10 +171,61 @@ Word::Word()
 
 Word::Word(const char * word)
 {
-	setToEmptyState();
+	
 
-	m_name = word;
-	m_total = 0;
+	if (word != NULL && word[0] != '\0') { //Check if word is valid.
+		m_name = word;
+		m_total = 0;
+	}
+	else {
+		setToEmptyState();
+		
+	}
+}
+
+Word::Word(std::string && str)
+{
+
+	if (!str.empty()) {
+
+		m_name = std::move(str);
+		m_total = 0;
+	}
+	else {
+		setToEmptyState();
+	}
+}
+
+Word::Word(const std::string & str)
+{
+	if (!str.empty()) {
+
+		m_name = str;
+		m_total = 0;
+	}
+	else {
+		setToEmptyState();
+	}
+}
+
+Word::Word(const Word & src)
+{
+
+	m_name = src.m_name;
+	m_total = src.m_total;
+	std::copy(src.m_next_states_index.begin(), src.m_next_states_index.end(), std::back_inserter(m_next_states_index));
+
+}
+
+Word::Word(Word && src)
+{
+
+	m_name = std::move(src.m_name);
+	m_total = src.m_total;
+	std::move(src.m_next_states_index.begin(), src.m_next_states_index.end(), std::back_inserter(m_next_states_index));
+
+
+
 }
 
 

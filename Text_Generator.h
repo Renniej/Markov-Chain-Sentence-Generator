@@ -3,25 +3,25 @@
 
 #include <fstream>
 #include <iostream>
-#include <list>
+#include <forward_list>
 #include "Word.h"
 
 
 class Text_Generator
 {
 
-	std::list<Word> m_words;
+	std::forward_list<Word> m_words;
 	size_t m_list_size;
 
 
-	void Add_Source(const char* str);
+	void Add_Source(const std::string& line);
 
 
-	Word *  Find_Word(std::string word);
+	Word *  Find_Word(const std::string word);
 
 	std::string& CheckForSpecialChar(std::string& str_word);
 
-
+	std::string delim;
 
 	
 
@@ -33,7 +33,7 @@ public:
 
 	Text_Generator();
 	Text_Generator(const char* str);
-	Text_Generator(std::ifstream& ifs);
+	Text_Generator(std::ifstream& ifs, const char * delimter);
 	
 	~Text_Generator();
 };
