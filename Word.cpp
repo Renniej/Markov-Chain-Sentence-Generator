@@ -93,16 +93,11 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 	if (length > 0) {
 
 		sentence = m_name;
-		bool complete; //Represents a complete sentence
+		
 
 		Word* next_word = getNextWord();
 
-		
-
-
-		do {
-
-			complete = true; //Assume the sentence made will be approiate length
+	
 
 			for (int i = 0; i < length; ++i) {
 
@@ -114,14 +109,13 @@ std::string Word::make_sentence(size_t length) //should move this to text_genera
 
 				}
 				else {
-					complete = false; //Nullptr found early, break loop and try again.
 					break;
 				}
 
 
 			}
 
-		} while (!complete);
+	
 		
 	}
 	else {

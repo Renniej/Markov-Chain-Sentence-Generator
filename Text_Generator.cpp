@@ -76,10 +76,17 @@ void Text_Generator::Add_Source(const std::string& line ) //Feed me WORDS so i c
 	Word * found_word = nullptr; //Used to check if a word object exist in m_words
 
 	
+	
 
+	//int next_pos = line.find(delim); //next position in line to scan (Delimiter is a space)
+	auto get_next_pos = [&](int n_pos) {return line.find(delim, line.find(delim, n_pos + 1) + 1); };
 
-	int next_pos = line.find(delim); //next position in line to scan (Delimiter is a space)
+	int next_pos = line.find(delim, line.find(delim) + 1); //next position in line to scan (Looks for 2 delimters)
 	int prev_pos = 0;
+
+	
+
+
 
 	if (!line.empty()) {  //If string is not empty
 		
@@ -109,12 +116,13 @@ void Text_Generator::Add_Source(const std::string& line ) //Feed me WORDS so i c
 
 		//Now that we have data necessarily for looping (prev_word & next_pos)
 		prev_pos = next_pos; //Set previous position to where last space was
-		next_pos = line.find(delim, next_pos + 1); //Grab next space.
+		
+		next_pos = get_next_pos(next_pos); //Grab next space.
 
 		
 		while (next_pos != std::string::npos) {
-
-			grabbed_word = CheckForSpecialChar(line.substr(prev_pos + 1, next_pos - 1)); //Grab word from line
+			
+			grabbed_word = CheckForSpecialChar(line.substr(prev_pos+1, next_pos - prev_pos - 1)); //Grab word from line
 			found_word = Find_Word(grabbed_word); //Check if first word exist in m_words list
 
 
@@ -137,7 +145,9 @@ void Text_Generator::Add_Source(const std::string& line ) //Feed me WORDS so i c
 			}
 
 			prev_pos = next_pos; //Set previous position to where last space was
-			next_pos = line.find(delim, next_pos + 1); //Grab next space.
+		//next_pos = line.find(delim, next_pos + 1); //Grab next space.
+			next_pos = get_next_pos(next_pos);
+		
 
 		}
 
@@ -186,9 +196,9 @@ std::string & Text_Generator::CheckForSpecialChar(std::string& str_word)
 
 	for (int i = 0; i < str_word.length(); ++i) {
 
-		if (!isalpha(str_word[i])  || strcmp(&str_word[i], " ")  == 0) { //If a non-alphabetic letter is found then assume it is a special character then...
+		if (!isalpha(str_word[i]) && str_word[i] != ' ') { //If a non-alphabetic letter is found then assume it is a special character then...
 
-			str_word.erase(i); //Remove special character
+			str_word.erase(str_word.begin()+i); //Remove special character
 
 
 		}
@@ -206,7 +216,7 @@ std::string & Text_Generator::CheckForSpecialChar(std::string& str_word)
 std::string Text_Generator::make_sentence()
 {
 	
-	int length = rand() % 15 + 10; //Number of words in sentence (1-30)
+	int length = rand() % 7 + 5; //Number of words in sentence 
 	int word_index = rand() % (m_list_size - 1);
 	std::forward_list<Word>::iterator itr = m_words.begin();
 

@@ -34,21 +34,12 @@ int main(void) {
 
 	Text_Generator test(file, " ");
 
+
+
 	for (int i = 0; i<5; ++i)
 	std::cout << test.make_sentence() << std::endl;
 
 
-	for (int i = 0; i < 5; ++i)
-		std::cout << test.make_sentence() << std::endl;
-
-
-
-	for (int i = 0; i < 5; ++i)
-		std::cout << test.make_sentence() << std::endl;
-
-
-	for (int i = 0; i < 5; ++i)
-		std::cout << test.make_sentence() << std::endl;
 
 
 
